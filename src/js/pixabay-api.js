@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 const API_KEY = '44780398-b9dbe1b89370a8f5261d05d93';
 
 export async function getPicturesByQuery(query) {
@@ -5,13 +7,11 @@ export async function getPicturesByQuery(query) {
     query
   )}&image_type=photo&orientation=horizontal&safesearch=true`;
 
-  return await url;
+  try {
+    const response = await axios.get(url);
 
-  //         .then(res => {
-  //     if (!res.ok) {
-  //       throw new Error(res.status);
-  //     }
-  //     return res.json();
-  //   });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 }
-console.log('hello');
