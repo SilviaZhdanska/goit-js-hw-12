@@ -1,35 +1,34 @@
-import axios from 'axios';
 import iziToast from 'izitoast';
 import SimpleLightbox from 'simplelightbox';
 import 'izitoast/dist/css/iziToast.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const cardContainer = document.querySelector('.card-container');
+const loadMoreButton = document.querySelector('.load-more-button');
 
 export function renderGallery(images) {
-  const cardContainer = document.querySelector('.card-container');
   const markup = images
     .map(
       image => `
-    <div class="card">
-      <div class="card-img-top">
-        <a href="${image.largeImageURL}">
-          <img src="${image.webformatURL}" alt="${image.tags}" >
-        </a>
+      <div class="card">
+        <div class="card-img-top">
+          <a href="${image.largeImageURL}">
+            <img src="${image.webformatURL}" alt="${image.tags}">
+          </a>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title visually-hidden">${image.tags}</h2>
+          <p class="card-text">Likes: ${image.likes}</p>
+          <p class="card-text">Views: ${image.views}</p>
+          <p class="card-text">Comments: ${image.comments}</p>
+          <p class="card-text">Downloads: ${image.downloads}</p>
+        </div>
       </div>
-      <div class="card-body">
-        <h2 class="card-title visually-hidden">${image.tags}</h2>
-        <p class="card-text">Likes: ${image.likes}</p>
-        <p class="card-text">Views: ${image.views}</p>
-        <p class="card-text">Comments: ${image.comments}</p>
-        <p class="card-text">Downloads: ${image.downloads}</p>
-      </div>
-    </div>
-  `
+    `
     )
     .join('');
 
-  cardContainer.innerHTML = markup;
+  cardContainer.innerHTML += markup;
 
   const lightbox = new SimpleLightbox('.card-img-top a', {
     captions: true,
@@ -37,6 +36,8 @@ export function renderGallery(images) {
   });
 
   lightbox.refresh();
+
+  showLoadMoreButton();
 }
 
 export function showNoResultsMessage() {
@@ -47,6 +48,8 @@ export function showNoResultsMessage() {
     message:
       'Sorry, there are no images matching your search query. Please try again!',
   });
+
+  hideLoadMoreButton();
 }
 
 export function showFetchErrorMessage() {
@@ -56,4 +59,29 @@ export function showFetchErrorMessage() {
     message:
       'Sorry, there was an error fetching images. Please try again later.',
   });
+
+  hideLoadMoreButton();
+}
+
+export function hideLoadMoreButton() {
+  loadMoreButton.style.display = 'none';
+}
+
+export function showLoadMoreButton() {
+  loadMoreButton.style.display = 'block';
+}
+
+export function showEndOfResultsMessage() {
+  iziToast.info({
+    backgroundColor: 'green',
+    position: 'topRight',
+    title: 'Info',
+    message: "We're sorry, but you've reached the end of search results.",
+  });
+
+  hideLoadMoreButton();
+}
+
+export function scrollToLoadMore() {
+  loadMoreButton.scrollIntoView({ behavior: 'smooth' });
 }
