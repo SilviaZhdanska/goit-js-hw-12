@@ -81,7 +81,3 @@ export function showEndOfResultsMessage() {
 
   hideLoadMoreButton();
 }
-
-export function scrollToLoadMore() {
-  loadMoreButton.scrollIntoView({ behavior: 'smooth' });
-}

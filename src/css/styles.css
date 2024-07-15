@@ -13,6 +13,19 @@ input {
   padding: 0;
 }
 
+.form-control {
+  border: 1px solid #808080;
+  border-radius: 4px;
+  width: 272px;
+  height: 40px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0.04em;
+  color: #808080;
+  padding-left: 16px;
+}
+
 button {
   border: none;
   border-radius: 8px;
@@ -75,6 +88,7 @@ button:hover {
   box-sizing: border-box;
   border: 1px solid #808080;
   overflow: hidden;
+  margin-bottom: 32px;
 }
 
 .card-img-top {
@@ -123,4 +137,11 @@ button:hover {
   clip-path: inset(100%);
   clip: rect(0 0 0 0);
   overflow: hidden;
+}
+
+.load-more-button {
+  width: 125px;
+  height: 40px;
+  margin-top: 32px;
+  margin: 0 auto;
 }

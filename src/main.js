@@ -7,74 +7,89 @@ import {
   hideLoadMoreButton,
   showEndOfResultsMessage,
   showLoadMoreButton,
-  scrollToLoadMore,
 } from './js/render-functions.js';
 
-const searchForm = document.querySelector('.search-form');
-const loadMoreButton = document.querySelector('.load-more-button');
-const loader = document.querySelector('.loader');
-const cardContainer = document.querySelector('.card-container');
+document.addEventListener('DOMContentLoaded', () => {
+  const searchForm = document.querySelector('.search-form');
+  const loadMoreButton = document.querySelector('.load-more-button');
+  const loader = document.querySelector('.loader');
+  const cardContainer = document.querySelector('.card-container');
 
-loader.style.display = 'none';
-loadMoreButton.style.display = 'none';
+  loader.style.display = 'none';
+  loadMoreButton.style.display = 'none';
 
-let currentPage = 1;
-let currentQuery = '';
+  let currentPage = 1;
+  let currentQuery = '';
+  let form;
 
-searchForm.addEventListener('submit', handleSearch);
+  searchForm.addEventListener('submit', handleSearch);
 
-async function handleSearch(event) {
-  event.preventDefault();
+  async function handleSearch(event) {
+    event.preventDefault();
 
-  const form = event.currentTarget;
-  const queryValue = form.elements.query.value.trim().toLowerCase();
+    form = event.currentTarget;
+    const queryValue = form.elements.query.value.trim().toLowerCase();
 
-  if (!queryValue) {
-    return;
+    if (!queryValue) {
+      return;
+    }
+
+    loader.style.display = 'inline-block';
+    cardContainer.innerHTML = '';
+
+    try {
+      const data = await fetchImages(queryValue);
+      loader.style.display = 'none';
+
+      if (data.hits.length === 0) {
+        showNoResultsMessage();
+        hideLoadMoreButton();
+      } else {
+        renderGallery(data.hits);
+        showLoadMoreButton();
+        currentPage = 1;
+        currentQuery = queryValue;
+        smoothScrollToNextGroup();
+      }
+    } catch (error) {
+      loader.style.display = 'none';
+      showFetchErrorMessage();
+    } finally {
+      form.reset();
+    }
   }
 
-  loader.style.display = 'inline-block';
-  cardContainer.innerHTML = '';
+  loadMoreButton.addEventListener('click', async () => {
+    loader.style.display = 'inline-block';
 
-  try {
-    const data = await fetchImages(queryValue);
-    loader.style.display = 'none';
+    try {
+      const data = await fetchImages(currentQuery);
+      loader.style.display = 'none';
 
-    if (data.hits.length === 0) {
-      showNoResultsMessage();
-      hideLoadMoreButton();
-    } else {
-      renderGallery(data.hits);
-      showLoadMoreButton();
-      scrollToLoadMore();
-      currentPage = 1;
-      currentQuery = queryValue;
+      if (data.hits.length === 0) {
+        showEndOfResultsMessage();
+        hideLoadMoreButton();
+      } else {
+        renderGallery(data.hits);
+        currentPage += 1;
+        smoothScrollToNextGroup();
+      }
+    } catch (error) {
+      loader.style.display = 'none';
+      showFetchErrorMessage();
+    } finally {
+      form.reset();
     }
-  } catch (error) {
-    loader.style.display = 'none';
-    showFetchErrorMessage();
-  } finally {
-    form.reset();
-  }
-}
+  });
 
-loadMoreButton.addEventListener('click', async () => {
-  loader.style.display = 'inline-block';
+  function smoothScrollToNextGroup() {
+    const cardHeight = cardContainer
+      .querySelector('.card')
+      .getBoundingClientRect().height;
 
-  try {
-    const data = await fetchImages(currentQuery);
-    loader.style.display = 'none';
-
-    if (data.hits.length === 0) {
-      showEndOfResultsMessage();
-      hideLoadMoreButton();
-    } else {
-      renderGallery(data.hits);
-      scrollToLoadMore();
-      currentPage++;
-    }
-  } catch (error) {
-    loader.style.display = 'none';
-    showFetchErrorMessage();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
   }
 });
